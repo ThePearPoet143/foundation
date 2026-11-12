@@ -38,6 +38,10 @@ Describe 'Get-ReleaseNote' {
         $body = "## What and why`n`nReleases v0.2.0: the review pack.`n`nIssues released: SUS-33.`n`n## Proven`n`n- foundation#9`n`nmodel line"
         Get-ReleaseNote $body | Should -Be "Releases v0.2.0: the review pack.`n`nIssues released: SUS-33."
     }
+    It 'leaves out the model line when What and why is the last section' {
+        $body = "## What and why`n`nReleases v0.2.0: the review pack.`n`nIssues released: SUS-33.`n`nmodel line"
+        Get-ReleaseNote $body | Should -Be "Releases v0.2.0: the review pack.`n`nIssues released: SUS-33."
+    }
     It 'fails a body with no What and why' {
         { Get-ReleaseNote 'nothing here' } | Should -Throw '*What and why*'
     }

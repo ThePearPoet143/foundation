@@ -6,11 +6,15 @@ $ErrorActionPreference = 'Stop'
 . "$PSScriptRoot\Release.ps1"
 
 $version = Get-ReleaseVersion ([IO.File]::ReadAllText("$PSScriptRoot\..\workflows\pr-rules.yml"))
-gh release view $version --repo $Repo *> $null
-if ($LASTEXITCODE -eq 0) { Write-Output "$version is already released."; exit 0 }
+# Listing the releases fails outright on an auth or network error, rather than reading as "not released yet".
+$released = gh release list --repo $Repo --limit 1000 --json tagName --jq '.[].tagName'
+if ($LASTEXITCODE -ne 0) { throw 'gh release list failed' }
+if (@($released) -contains $version) { Write-Output "$version is already released."; exit 0 }
 
 # GitHub's "List pull requests associated with a commit": the merged PR whose merge commit this is.
-$pr = gh api "repos/$Repo/commits/$Sha/pulls" | ConvertFrom-Json |
+$pulls = gh api "repos/$Repo/commits/$Sha/pulls"
+if ($LASTEXITCODE -ne 0) { throw "gh api repos/$Repo/commits/$Sha/pulls failed" }
+$pr = $pulls | ConvertFrom-Json |
     Where-Object { $_.merge_commit_sha -eq $Sha -and $_.base.ref -eq 'main' } | Select-Object -First 1
 if (-not $pr) { Write-Output "No release PR merged as $Sha, so nothing to release."; exit 0 }
 

@@ -20,9 +20,11 @@ function Get-ReleaseTitle([string]$PrTitle, [string]$Version) {
     "${Version}: $($Matches[2])"
 }
 
-# The release notes: the release PR's "What and why".
+# The release notes: the release PR's "What and why". Its last line is the model line, so it's left out first, as
+# Test-PrBody does; otherwise a What and why that ends the body would end with it.
 function Get-ReleaseNote([string]$Body) {
-    $note = Get-Section $Body 'What and why'
+    $sections = ($Body.TrimEnd() -split "`r?`n" | Select-Object -SkipLast 1) -join "`n"
+    $note = Get-Section $sections 'What and why'
     if (-not $note) { throw 'The release PR has no "## What and why" section for the notes' }
     $note -replace "`r`n", "`n"
 }
