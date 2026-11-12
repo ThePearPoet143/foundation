@@ -1,9 +1,10 @@
 # Release helpers (SUS-45): what a merge into main releases. release.yml runs Invoke-Release.ps1, which uses them.
 . "$PSScriptRoot\..\actions\text-check\TextCheck.ps1"
 
-# pr-rules.yml's text, for Get-ReleaseVersion.
+# pr-rules.yml's text, for Get-ReleaseVersion. Join-Path with forward slashes: .NET on Linux reads a backslash as part
+# of a file name, while Windows takes either.
 function Read-PrRule {
-    [IO.File]::ReadAllText("$PSScriptRoot\..\workflows\pr-rules.yml")
+    [IO.File]::ReadAllText((Join-Path $PSScriptRoot '../workflows/pr-rules.yml'))
 }
 
 # The version is the one pr-rules.yml calls the foundation's own parts at: every call names the release it ships in
