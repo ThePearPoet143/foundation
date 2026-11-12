@@ -54,6 +54,14 @@ updates:
 Dependabot's pull requests run only the size check: a bot writes no issue key, sections or 🤖 line, so the text and
 branch checks skip them.
 
+## Releasing
+
+A release is a pull request from `dev` into `main`, titled `chore(release): v0.2.0, what it brings (SUS-123)`, after
+every call in `pr-rules.yml` has moved to `@v0.2.0`. Merging it releases it: `release.yml` tags the merge `v0.2.0` and
+publishes the GitHub release, named from the title, with the pull request's "What and why" as its notes. Then
+Dependabot opens the bump in every repo (Staying current). A title that names a different version than `pr-rules.yml`
+fails the release instead of tagging it.
+
 ## The rules
 
 **Title:** `type(scope): what changed (KEY-123)`, at most 72 characters: plain words saying what's different, the

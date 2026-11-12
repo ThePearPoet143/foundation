@@ -1,0 +1,26 @@
+# Publishes the release when a release PR merges into main (SUS-45): .github/release/Invoke-Release.ps1 tags the merge
+# with the version pr-rules.yml calls and makes the GitHub release, with the PR's "What and why" as its notes.
+# Dependabot then opens the bump in each repo. `contents: write` "allows the action to create a release" (GitHub,
+# Controlling permissions for GITHUB_TOKEN).
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: ./.github/release/Invoke-Release.ps1
