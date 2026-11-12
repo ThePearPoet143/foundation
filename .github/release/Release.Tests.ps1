@@ -2,6 +2,12 @@ BeforeAll {
     . "$PSScriptRoot\Release.ps1"
 }
 
+Describe 'Read-PrRule' {
+    It 'reads pr-rules.yml from the release folder, on Linux as on Windows' {
+        Read-PrRule | Should -Match 'name: pr-rules'
+    }
+}
+
 Describe 'Get-ReleaseVersion' {
     It 'returns the one version pr-rules.yml calls the foundation at' {
         $workflow = @(
