@@ -14,7 +14,7 @@ on:
     types: [opened, edited, synchronize, reopened]
 jobs:
   rules:
-    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.1
+    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.2
     with:
       issue-prefix: SUS   # the repo's Linear key
 ```
@@ -24,7 +24,7 @@ The foundation is at 0.x: "Major version zero (0.y.z) is for initial development
 own small PR, after reading the release notes. A moving `v1` tag comes when the rules are stable. Each repo keeps its
 own CI for its own tests.
 
-Every file here that calls another part of the foundation names the same version as its release (`@v0.1.1`), so a
+Every file here that calls another part of the foundation names the same version as its release (`@v0.1.2`), so a
 release's tag points at files that refer to it.
 
 ## Staying current
@@ -43,10 +43,24 @@ updates:
       interval: weekly
     allow:
       - dependency-name: ThePearPoet143/foundation*
+    cooldown:
+      exclude:
+        - ThePearPoet143/foundation*
 ```
+
+`cooldown.exclude` lets a release through the day it's out: Dependabot otherwise holds every new version back by a
+"default cooldown period of 3 days" (GitHub, Dependabot options reference).
 
 Dependabot's pull requests run only the size check: a bot writes no issue key, sections or 🤖 line, so the text and
 branch checks skip them.
+
+## Releasing
+
+A release is a pull request from `dev` into `main`, titled `chore(release): v0.2.0, what it brings (SUS-123)`, after
+every call in `pr-rules.yml` has moved to `@v0.2.0`. Merging it releases it: `release.yml` tags the merge `v0.2.0` and
+publishes the GitHub release, named from the title, with the pull request's "What and why" as its notes. Then
+Dependabot opens the bump in every repo (Staying current). A title that names a different version than `pr-rules.yml`
+fails the release instead of tagging it.
 
 ## The rules
 
