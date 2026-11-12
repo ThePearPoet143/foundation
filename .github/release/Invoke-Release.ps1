@@ -5,7 +5,7 @@ param([string]$Sha = $env:SHA, [string]$Repo = $env:REPO)
 $ErrorActionPreference = 'Stop'
 . "$PSScriptRoot\Release.ps1"
 
-$version = Get-ReleaseVersion ([IO.File]::ReadAllText("$PSScriptRoot\..\workflows\pr-rules.yml"))
+$version = Get-ReleaseVersion (Read-PrRule)
 # Listing the releases fails outright on an auth or network error, rather than reading as "not released yet".
 $released = gh release list --repo $Repo --limit 1000 --json tagName --jq '.[].tagName'
 if ($LASTEXITCODE -ne 0) { throw 'gh release list failed' }
