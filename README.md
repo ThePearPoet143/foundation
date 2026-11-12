@@ -14,7 +14,7 @@ on:
     types: [opened, edited, synchronize, reopened]
 jobs:
   rules:
-    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.0
+    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.1
     with:
       issue-prefix: SUS   # the repo's Linear key
 ```
@@ -24,8 +24,29 @@ The foundation is at 0.x: "Major version zero (0.y.z) is for initial development
 own small PR, after reading the release notes. A moving `v1` tag comes when the rules are stable. Each repo keeps its
 own CI for its own tests.
 
-Every file here that calls another part of the foundation names the same version as its release (`@v0.1.0`), so a
+Every file here that calls another part of the foundation names the same version as its release (`@v0.1.1`), so a
 release's tag points at files that refer to it.
+
+## Staying current
+
+Dependabot brings each release to the repo: add `.github/dependabot.yml`, and it opens a pull request into the default
+branch that bumps the version, "references to actions in a repository's workflow.yml file and reusable workflows used
+inside workflows" ([GitHub](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot)).
+That pull request runs the new version's checks, so a breaking change shows there before the merge.
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    allow:
+      - dependency-name: ThePearPoet143/foundation*
+```
+
+Dependabot's pull requests run only the size check: a bot writes no issue key, sections or 🤖 line, so the text and
+branch checks skip them.
 
 ## The rules
 
