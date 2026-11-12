@@ -1,0 +1,69 @@
+# The foundation's PR rules, for other repos to call:
+#   on:
+#     pull_request:
+#       types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+#   jobs:
+#     rules:
+#       uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.0
+#       permissions:            # only for the size check: it labels the PR
+#         contents: read
+#         issues: write
+#         pull-requests: write
+#       with:
+#         issue-prefix: SUS
+#         checks: text, size     # default: text
+# A private repo can call it because the foundation's Actions access is "user": "user level access allows sharing across
+# user owned private repositories only" (GitHub REST, Actions permissions). A called workflow can't raise the caller's
+# permissions ("permissions can only be maintained or reduced"), so a repo grants the size check's permissions itself.
+name: pr-rules
+
+on:
+  workflow_call:
+    inputs:
+      issue-prefix:
+        description: The repo's Linear issue key, such as SUS or GDS.
+        type: string
+        required: true
+      checks:
+        description: The checks to run, separated by commas. text (SUS-27); size (SUS-28); branch (SUS-29).
+        type: string
+        default: text
+      size-extra-ignored:
+        description: More paths the size check leaves out, as globs separated by commas.
+        type: string
+        default: ''
+
+jobs:
+  text:
+    if: contains(inputs.checks, 'text')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: ThePearPoet143/foundation/.github/actions/text-check@v0.1.0
+        with:
+          issue-prefix: ${{ inputs.issue-prefix }}
+
+  size:
+    if: contains(inputs.checks, 'size')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ThePearPoet143/foundation/.github/actions/size@v0.1.0
+        with:
+          extra-ignored: ${{ inputs.size-extra-ignored }}
+
+  branch:
+    if: contains(inputs.checks, 'branch')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ThePearPoet143/foundation/.github/actions/branch@v0.1.0
+        with:
+          issue-prefix: ${{ inputs.issue-prefix }}

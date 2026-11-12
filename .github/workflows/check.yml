@@ -1,0 +1,44 @@
+# The foundation's own CI (SUS-27): its tests under both shells its scripts must run in, Windows PowerShell 5.1 and
+# PowerShell 7, and PSScriptAnalyzer. ubuntu-24.04 has PowerShell 7.6.9, Pester 5.9.0 and PSScriptAnalyzer 1.25.0;
+# windows-latest has Pester 5.9.0 for Windows PowerShell (actions/runner-images, Ubuntu2404 and Windows2025 readmes).
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [dev, main]
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            shell: pwsh
+          - os: windows-latest
+            shell: powershell
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Tests (Pester 5)
+        run: |
+          Import-Module Pester -MinimumVersion 5.0
+          $configuration = New-PesterConfiguration
+          $configuration.Run.Path = '.github/actions'
+          $configuration.Run.Exit = $true
+          $configuration.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $configuration
+
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $findings = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Warning, Error
+          $findings | Format-Table RuleName, Severity, ScriptName, Line, Message -AutoSize -Wrap
+          if ($findings) { exit 1 }

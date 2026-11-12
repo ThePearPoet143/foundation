@@ -1,0 +1,23 @@
+# The size check as a composite action (SUS-28). The job that uses it checks out the PR with its history
+# (fetch-depth: 0) and grants pull-requests: write, which "permits an action to add a label to a pull request", and
+# issues: write for creating the labels (GitHub's token permissions).
+name: Size check
+description: Labels a PR by its effective changed lines and fails size:XL and larger unless size-exempt.
+inputs:
+  extra-ignored:
+    description: More paths to leave out of the count, as globs separated by commas.
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Count and label
+      shell: pwsh
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_LABELS: ${{ toJSON(github.event.pull_request.labels) }}
+        EXTRA_IGNORED: ${{ inputs.extra-ignored }}
+        GH_TOKEN: ${{ github.token }}
+      run: '& "$env:GITHUB_ACTION_PATH/Invoke-Size.ps1"'

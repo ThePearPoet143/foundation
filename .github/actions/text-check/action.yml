@@ -1,0 +1,19 @@
+# The text check as a composite action (SUS-27). A composite action brings its own files: GITHUB_ACTION_PATH is "the
+# path where an action is located ... only supported in composite actions" (GitHub's variables reference), which is
+# how a private repo's script reaches the repos that call it.
+name: Text check
+description: Checks a PR's title and description against the foundation's rules.
+inputs:
+  issue-prefix:
+    description: The repo's Linear issue key, such as SUS or GDS.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Check the title and description
+      shell: pwsh
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_BODY: ${{ github.event.pull_request.body }}
+        ISSUE_PREFIX: ${{ inputs.issue-prefix }}
+      run: '& "$env:GITHUB_ACTION_PATH/Invoke-TextCheck.ps1"'
