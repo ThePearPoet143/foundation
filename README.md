@@ -43,7 +43,13 @@ updates:
       interval: weekly
     allow:
       - dependency-name: ThePearPoet143/foundation*
+    cooldown:
+      exclude:
+        - ThePearPoet143/foundation*
 ```
+
+`cooldown.exclude` lets a release through the day it's out: Dependabot otherwise holds every new version back by a
+"default cooldown period of 3 days" (GitHub, Dependabot options reference).
 
 Dependabot's pull requests run only the size check: a bot writes no issue key, sections or 🤖 line, so the text and
 branch checks skip them.
