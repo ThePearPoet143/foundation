@@ -4,7 +4,7 @@
 #       types: [opened, edited, synchronize, reopened, labeled, unlabeled]
 #   jobs:
 #     rules:
-#       uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.1
+#       uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.2
 #       permissions:            # only for the size check: it labels the PR
 #         contents: read
 #         issues: write
@@ -41,7 +41,7 @@ jobs:
     if: contains(inputs.checks, 'text') && github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-24.04
     steps:
-      - uses: ThePearPoet143/foundation/.github/actions/text-check@v0.1.1
+      - uses: ThePearPoet143/foundation/.github/actions/text-check@v0.1.2
         with:
           issue-prefix: ${{ inputs.issue-prefix }}
 
@@ -56,7 +56,7 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
-      - uses: ThePearPoet143/foundation/.github/actions/size@v0.1.1
+      - uses: ThePearPoet143/foundation/.github/actions/size@v0.1.2
         with:
           extra-ignored: ${{ inputs.size-extra-ignored }}
 
@@ -67,6 +67,6 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
-      - uses: ThePearPoet143/foundation/.github/actions/branch@v0.1.1
+      - uses: ThePearPoet143/foundation/.github/actions/branch@v0.1.2
         with:
           issue-prefix: ${{ inputs.issue-prefix }}
