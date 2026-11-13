@@ -14,7 +14,7 @@ on:
     types: [opened, edited, synchronize, reopened]
 jobs:
   rules:
-    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.1.2
+    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.2.0
     with:
       issue-prefix: SUS   # the repo's Linear key
 ```
@@ -24,8 +24,26 @@ The foundation is at 0.x: "Major version zero (0.y.z) is for initial development
 own small PR, after reading the release notes. A moving `v1` tag comes when the rules are stable. Each repo keeps its
 own CI for its own tests.
 
-Every file here that calls another part of the foundation names the same version as its release (`@v0.1.2`), so a
+Every file here that calls another part of the foundation names the same version as its release (`@v0.2.0`), so a
 release's tag points at files that refer to it.
+
+## The guardrails check
+
+`checks: guardrails` checks that a pull request works on one Linear issue whose scope was agreed (SUS-71): every commit,
+and every row it adds to a `changes\*.md` log, names the issue in its title; and in Linear the issue is past Backlog,
+since moving it out is how its scope is agreed. Releases and Dependabot's pull requests skip it.
+
+It starts in dry-run, warning only, as pingdotgg/t3code's `pr-limits.yml` does (MIT). Set the repository variable
+`GUARDRAILS_ENFORCE` to `true` to make it fail, and pass a Linear API key:
+
+```yaml
+    with:
+      issue-prefix: SUS
+      checks: text, size, branch, guardrails
+      guardrails-enforce: ${{ vars.GUARDRAILS_ENFORCE }}
+    secrets:
+      LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+```
 
 ## Staying current
 
