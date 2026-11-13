@@ -1,0 +1,27 @@
+# The Guardrails check as a composite action (SUS-71). The job that uses it checks out the PR with its history
+# (fetch-depth: 0), so the PR's commits and diff can be read.
+name: Guardrails
+description: A pull request works on one Linear issue whose scope was agreed; dry-run until enforced.
+inputs:
+  issue-prefix:
+    description: The repo's Linear issue key, such as SUS or GDS.
+    required: true
+  enforce:
+    description: '"true" fails on a problem; anything else only warns (dry-run).'
+    default: 'false'
+  linear-api-key:
+    description: A Linear API key that can read the repo's issues.
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Check the issue, the commits and the log rows
+      shell: pwsh
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        ISSUE_PREFIX: ${{ inputs.issue-prefix }}
+        ENFORCE: ${{ inputs.enforce }}
+        LINEAR_API_KEY: ${{ inputs.linear-api-key }}
+      run: '& "$env:GITHUB_ACTION_PATH/Invoke-Guardrails.ps1"'
