@@ -1,4 +1,4 @@
-# The Guardrails check (SUS-71): a pull request works on one issue whose scope was agreed. Its commits and the rows it
+﻿# The Guardrails check (SUS-71): a pull request works on one issue whose scope was agreed. Its commits and the rows it
 # adds to a changes\*.md log name that issue, and in Linear the issue is past Backlog: moving it out is how the owner
 # agrees its scope. Runs in dry-run, warning only, until the calling repo turns it on, as pingdotgg/t3code's
 # pr-limits.yml does (MIT).
