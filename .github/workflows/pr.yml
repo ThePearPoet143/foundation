@@ -35,3 +35,16 @@ jobs:
       - uses: ./.github/actions/branch
         with:
           issue-prefix: SUS
+
+  guardrails:
+    if: github.event.pull_request.base.ref != 'main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/guardrails
+        with:
+          issue-prefix: SUS
+          enforce: ${{ vars.GUARDRAILS_ENFORCE }}
+          linear-api-key: ${{ secrets.LINEAR_API_KEY }}
