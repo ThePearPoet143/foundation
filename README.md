@@ -14,7 +14,7 @@ on:
     types: [opened, edited, synchronize, reopened]
 jobs:
   rules:
-    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.2.0
+    uses: ThePearPoet143/foundation/.github/workflows/pr-rules.yml@v0.3.0
     with:
       issue-prefix: SUS   # the repo's Linear key
 ```
@@ -24,7 +24,7 @@ The foundation is at 0.x: "Major version zero (0.y.z) is for initial development
 own small PR, after reading the release notes. A moving `v1` tag comes when the rules are stable. Each repo keeps its
 own CI for its own tests.
 
-Every file here that calls another part of the foundation names the same version as its release (`@v0.2.0`), so a
+Every file here that calls another part of the foundation names the same version as its release (`@v0.3.0`), so a
 release's tag points at files that refer to it.
 
 ## The guardrails check
@@ -44,6 +44,18 @@ It starts in dry-run, warning only, as pingdotgg/t3code's `pr-limits.yml` does (
     secrets:
       LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
 ```
+
+## Where you see what
+
+| What | Where |
+| ---- | ----- |
+| Each check's pass or fail | The pull request's checks list: green, red, or a yellow warning |
+| What each check found, and why | One comment on the pull request, from the `report` job, edited on every push (SUS-73) |
+| The full detail | The check's log, in the Checks tab |
+| The work's progress | Linear: the pull request links its issue, and merging marks it Done |
+| What a release brought | The GitHub release's notes, from the release pull request |
+
+A calling repo grants the report `pull-requests: write`, as it does for the size check's labels.
 
 ## Staying current
 

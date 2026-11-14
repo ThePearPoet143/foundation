@@ -12,10 +12,15 @@ inputs:
   linear-api-key:
     description: A Linear API key that can read the repo's issues.
     default: ''
+outputs:
+  summary:
+    description: What the check printed, for the report comment.
+    value: ${{ steps.check.outputs.summary }}
 runs:
   using: composite
   steps:
     - name: Check the issue, the commits and the log rows
+      id: check
       shell: pwsh
       env:
         PR_TITLE: ${{ github.event.pull_request.title }}
@@ -24,4 +29,5 @@ runs:
         ISSUE_PREFIX: ${{ inputs.issue-prefix }}
         ENFORCE: ${{ inputs.enforce }}
         LINEAR_API_KEY: ${{ inputs.linear-api-key }}
-      run: '& "$env:GITHUB_ACTION_PATH/Invoke-Guardrails.ps1"'
+      # Through the report's wrapper, which keeps what the check prints as this step's summary (SUS-73).
+      run: '& "$env:GITHUB_ACTION_PATH/../report/Invoke-Captured.ps1" -Script "$env:GITHUB_ACTION_PATH/Invoke-Guardrails.ps1"'

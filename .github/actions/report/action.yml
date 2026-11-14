@@ -1,0 +1,19 @@
+# The checks' report as a composite action (SUS-73): one comment on the pull request saying what each check found.
+# The job that uses it needs pull-requests: write, and runs after the check jobs with if: always().
+name: Checks report
+description: Writes one comment on the pull request, edited on every push, with what each foundation check found.
+inputs:
+  needs-json:
+    description: The check jobs' results, as toJSON(needs).
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Write the report comment
+      shell: pwsh
+      env:
+        NEEDS_JSON: ${{ inputs.needs-json }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        GH_TOKEN: ${{ github.token }}
+      run: '& "$env:GITHUB_ACTION_PATH/Invoke-Report.ps1"'
