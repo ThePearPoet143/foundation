@@ -8,14 +8,19 @@ on:
 jobs:
   text:
     runs-on: ubuntu-24.04
+    outputs:
+      summary: ${{ steps.check.outputs.summary }}
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: ./.github/actions/text-check
+        id: check
         with:
           issue-prefix: SUS
 
   size:
     runs-on: ubuntu-24.04
+    outputs:
+      summary: ${{ steps.check.outputs.summary }}
     permissions:
       contents: read
       issues: write
@@ -25,26 +30,45 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/size
+        id: check
 
   branch:
     runs-on: ubuntu-24.04
+    outputs:
+      summary: ${{ steps.check.outputs.summary }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
       - uses: ./.github/actions/branch
+        id: check
         with:
           issue-prefix: SUS
 
   guardrails:
     if: github.event.pull_request.base.ref != 'main'
     runs-on: ubuntu-24.04
+    outputs:
+      summary: ${{ steps.check.outputs.summary }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
       - uses: ./.github/actions/guardrails
+        id: check
         with:
           issue-prefix: SUS
           enforce: ${{ vars.GUARDRAILS_ENFORCE }}
           linear-api-key: ${{ secrets.LINEAR_API_KEY }}
+
+  report:
+    if: always()
+    needs: [text, size, branch, guardrails]
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: ./.github/actions/report
+        with:
+          needs-json: ${{ toJSON(needs) }}

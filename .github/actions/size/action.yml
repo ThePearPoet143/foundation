@@ -8,10 +8,15 @@ inputs:
     description: More paths to leave out of the count, as globs separated by commas.
     required: false
     default: ''
+outputs:
+  summary:
+    description: What the check printed, for the report comment.
+    value: ${{ steps.check.outputs.summary }}
 runs:
   using: composite
   steps:
     - name: Count and label
+      id: check
       shell: pwsh
       env:
         BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -20,4 +25,5 @@ runs:
         PR_LABELS: ${{ toJSON(github.event.pull_request.labels) }}
         EXTRA_IGNORED: ${{ inputs.extra-ignored }}
         GH_TOKEN: ${{ github.token }}
-      run: '& "$env:GITHUB_ACTION_PATH/Invoke-Size.ps1"'
+      # Through the report's wrapper, which keeps what the check prints as this step's summary (SUS-73).
+      run: '& "$env:GITHUB_ACTION_PATH/../report/Invoke-Captured.ps1" -Script "$env:GITHUB_ACTION_PATH/Invoke-Size.ps1"'

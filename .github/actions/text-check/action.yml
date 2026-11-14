@@ -7,13 +7,19 @@ inputs:
   issue-prefix:
     description: The repo's Linear issue key, such as SUS or GDS.
     required: true
+outputs:
+  summary:
+    description: What the check printed, for the report comment.
+    value: ${{ steps.check.outputs.summary }}
 runs:
   using: composite
   steps:
     - name: Check the title and description
+      id: check
       shell: pwsh
       env:
         PR_TITLE: ${{ github.event.pull_request.title }}
         PR_BODY: ${{ github.event.pull_request.body }}
         ISSUE_PREFIX: ${{ inputs.issue-prefix }}
-      run: '& "$env:GITHUB_ACTION_PATH/Invoke-TextCheck.ps1"'
+      # Through the report's wrapper, which keeps what the check prints as this step's summary (SUS-73).
+      run: '& "$env:GITHUB_ACTION_PATH/../report/Invoke-Captured.ps1" -Script "$env:GITHUB_ACTION_PATH/Invoke-TextCheck.ps1"'
